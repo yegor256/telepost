@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/yegor256/telepost.svg)](https://travis-ci.org/yegor256/telepost)
 [![Gem Version](https://badge.fury.io/rb/telepost.svg)](http://badge.fury.io/rb/telepost)
-[![Maintainability](https://api.codeclimate.com/v1/badges/5528e182bb5e4a2ecc1f/maintainability)](https://codeclimate.com/github/yegor256/telepost/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/21aec58faee3866bdfbb/maintainability)](https://codeclimate.com/github/yegor256/telepost/maintainability)
 [![Yard Docs](http://img.shields.io/badge/yard-docs-blue.svg)](http://rubydoc.info/github/yegor256/telepost/master/frames)
 
 Telepost is a simple gateway to Telegram, which can post messages and respond to primitive requests.
