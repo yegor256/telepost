@@ -21,8 +21,10 @@ Then, use it like this:
 require 'telepost'
 require 'logger'
 tp = Telepost.new('..token..')
-tp.run do |chat, msg|
-  tp.post(chat: chat, 'Thanks for talking to me!')
+Thread.start do
+  tp.run do |chat, msg|
+    tp.post(chat: chat, 'Thanks for talking to me!')
+  end
 end
 tp.post(chat: 12345, 'How are you?', 'How are you doing?')
 ```
