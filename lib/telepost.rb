@@ -51,15 +51,19 @@ class Telepost
       # Nothing to do here
     end
 
-    def post(*lines, chat: 0)
+    def spam(*lines)
+      post(0, lines)
+    end
+
+    def post(chat, *lines)
       @sent << "#{chat}: #{lines.join(' ')}"
     end
   end
 
-  def initialize(token, chat: 0)
+  def initialize(token, chats: [])
     @token = token
     @client = Telebot::Client.new(token)
-    @chat = chat
+    @chats = chats
   end
 
   def run
@@ -75,8 +79,13 @@ class Telepost
     end
   end
 
-  def post(*lines, chat: @chat)
-    raise 'Default chat ID is not provided in the constuctor' if chat.zero?
+  def spam(*lines)
+    @chats.each do |chat|
+      post(chat, lines)
+    end
+  end
+
+  def post(chat, *lines)
     @client.send_message(
       chat_id: chat,
       parse_mode: 'Markdown',
