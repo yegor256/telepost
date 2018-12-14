@@ -66,11 +66,13 @@ class Telepost
     @chats = chats
   end
 
+  # You can run a chat bot to listen to the messages coming to it, in
+  # a separate thread.
   def run
     Telebot::Bot.new(@token).run do |chat, message|
       if block_given?
         yield(chat, message)
-      else
+      elsif !chat.nil?
         post(
           "This is your chat ID: `#{message.chat.id}`.",
           chat: message.chat.id
