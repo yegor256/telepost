@@ -60,6 +60,11 @@ class Telepost
     end
   end
 
+  # When can't post a message
+  class CantPost < StandardError; end
+
+  # Makes a new object. To obtain a token you should talk
+  # to the @BotFather in Telegram.
   def initialize(token, chats: [])
     @token = token
     @client = Telebot::Client.new(token)
@@ -81,20 +86,29 @@ class Telepost
     end
   end
 
+  # Send the message (lines will be concatenated with a space
+  # between them) to the chats provided in the constructor
+  # and encapsulated.
   def spam(*lines)
     @chats.each do |chat|
       post(chat, lines)
     end
   end
 
+  # Post a single message to the designated chat room. The
+  # chat argument can either me an integer, if you know the
+  # chat ID, or the name of the channel (your bot has to
+  # be the admin there). The lines provided will be
+  # concatenated with a space between them.
   def post(chat, *lines)
+    msg = lines.join(' ')
     @client.send_message(
       chat_id: chat,
       parse_mode: 'Markdown',
       disable_web_page_preview: true,
-      text: lines.join(' ')
+      text: msg
     )
   rescue Telebot::Error => e
-    raise "#{e.message}: \"#{msg}\""
+    raise CantPost, "#{e.message}: \"#{msg}\""
   end
 end
