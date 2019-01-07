@@ -9,7 +9,9 @@
 
 Telepost is a simple gateway to Telegram, which can post messages and respond to primitive requests.
 
-First, install it:
+First, get your token from [@BotFather](https://t.me/BotFather).
+
+Then, install it:
 
 ```bash
 $ gem install telepost
@@ -19,7 +21,6 @@ Then, use it like this:
 
 ```ruby
 require 'telepost'
-require 'logger'
 tp = Telepost.new('..token..')
 Thread.start do
   tp.run do |chat, msg|
@@ -27,6 +28,18 @@ Thread.start do
   end
 end
 tp.post(chat: 12345, 'How are you?', 'How are you doing?')
+```
+
+All lines you provide to the `post()` method will be concatenated
+with a space between them.
+
+Or you can pre-configure it to talk to certain list of chats.
+Your bot has to be an admin of the channel, in order to post there.
+Here is how you "spam":
+
+```ruby
+tp = Telepost.new('..token..', chats: ['my_channel'])
+tp.spam('How are you?')
 ```
 
 That's it.

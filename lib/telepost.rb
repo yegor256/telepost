@@ -84,6 +84,8 @@ class Telepost
         )
       end
     end
+  rescue Net::OpenTimeout
+    retry
   end
 
   # Send the message (lines will be concatenated with a space
