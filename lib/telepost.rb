@@ -63,6 +63,9 @@ class Telepost
   # When can't post a message
   class CantPost < StandardError; end
 
+  # To make it possible to get the client.
+  attr_reader :client
+
   # Makes a new object. To obtain a token you should talk
   # to the @BotFather in Telegram.
   def initialize(token, chats: [])
