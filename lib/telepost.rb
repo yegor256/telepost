@@ -81,10 +81,13 @@ class Telepost
       if block_given?
         yield(chat, message)
       elsif !chat.nil?
-        post(
-          "This is your chat ID: `#{message.chat.id}`.",
-          chat: message.chat.id
-        )
+        id = message.chat.id
+        if id.positive?
+          post(
+            "This is your chat ID: `#{message.chat.id}`.",
+            chat: message.chat.id
+          )
+        end
       end
     end
   rescue Net::OpenTimeout
