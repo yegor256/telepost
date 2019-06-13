@@ -7,6 +7,8 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/21aec58faee3866bdfbb/maintainability)](https://codeclimate.com/github/yegor256/telepost/maintainability)
 [![Yard Docs](http://img.shields.io/badge/yard-docs-blue.svg)](http://rubydoc.info/github/yegor256/telepost/master/frames)
 
+[![Hits-of-Code](https://hitsofcode.com/github/yegor256/telepost)](https://hitsofcode.com/view/github/yegor256/telepost)
+
 Telepost is a simple gateway to Telegram, which can post messages and respond to primitive requests.
 
 First, get your token from [@BotFather](https://t.me/BotFather).
