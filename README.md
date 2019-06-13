@@ -24,10 +24,10 @@ require 'telepost'
 tp = Telepost.new('..token..')
 Thread.start do
   tp.run do |chat, msg|
-    tp.post(chat: chat, 'Thanks for talking to me!')
+    tp.post(chat, 'Thanks for talking to me!')
   end
 end
-tp.post(chat: 12345, 'How are you?', 'How are you doing?')
+tp.post(12345, 'How are you?', 'How are you doing?')
 ```
 
 All lines you provide to the `post()` method will be concatenated

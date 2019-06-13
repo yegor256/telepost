@@ -84,8 +84,8 @@ class Telepost
         id = message.chat.id
         if id.positive?
           post(
-            "This is your chat ID: `#{message.chat.id}`.",
-            chat: message.chat.id
+            message.chat.id,
+            "This is your chat ID: `#{message.chat.id}`."
           )
         end
       end
