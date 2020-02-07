@@ -36,4 +36,13 @@ class TelepostTest < Minitest::Test
     tp.post('This is', 'a simple', 'message')
     assert_equal(1, tp.sent.count)
   end
+
+  def test_real_posting
+    skip
+    tp = Telepost.new(
+      '1088589765:...',
+      chats: [-1_001_438_256_738] # codexia channel
+    )
+    tp.spam('This is just a test message')
+  end
 end

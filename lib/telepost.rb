@@ -117,6 +117,6 @@ class Telepost
       text: msg
     )
   rescue Telebot::Error => e
-    raise CantPost, "#{e.message}: \"#{msg}\""
+    raise CantPost, "#{e.message}, can't post this message: \"#{msg}\""
   end
 end
