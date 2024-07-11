@@ -43,6 +43,7 @@ class Telepost
   # Fake one
   class Fake
     attr_reader :sent
+
     def initialize
       @sent = []
     end
