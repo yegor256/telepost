@@ -4,7 +4,7 @@
 [![DevOps By Rultor.com](http://www.rultor.com/b/yegor256/telepost)](http://www.rultor.com/p/yegor256/telepost)
 [![We recommend RubyMine](https://www.elegantobjects.org/rubymine.svg)](https://www.jetbrains.com/ruby/)
 
-[![Build Status](https://travis-ci.org/yegor256/telepost.svg)](https://travis-ci.org/yegor256/telepost)
+[![rake](https://github.com/yegor256/telepost/actions/workflows/rake.yml/badge.svg)](https://github.com/yegor256/telepost/actions/workflows/rake.yml)
 [![Gem Version](https://badge.fury.io/rb/telepost.svg)](http://badge.fury.io/rb/telepost)
 [![Maintainability](https://api.codeclimate.com/v1/badges/21aec58faee3866bdfbb/maintainability)](https://codeclimate.com/github/yegor256/telepost/maintainability)
 [![Yard Docs](http://img.shields.io/badge/yard-docs-blue.svg)](http://rubydoc.info/github/yegor256/telepost/master/frames)
