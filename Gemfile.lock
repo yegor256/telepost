@@ -2,7 +2,6 @@ PATH
   remote: .
   specs:
     telepost (0.0.0)
-      faraday (~> 1.0)
       telebot (= 0.1.2)
 
 GEM
