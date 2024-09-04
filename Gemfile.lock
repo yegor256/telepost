@@ -87,7 +87,7 @@ GEM
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
-    yard (0.9.36)
+    yard (0.9.37)
 
 PLATFORMS
   arm64-darwin-22
@@ -100,7 +100,7 @@ DEPENDENCIES
   rubocop-rspec (= 3.0.4)
   simplecov (= 0.22.0)
   telepost!
-  yard (= 0.9.36)
+  yard (= 0.9.37)
 
 BUNDLED WITH
    2.5.6
