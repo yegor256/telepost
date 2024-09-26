@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 require 'minitest/autorun'
+require 'yaml'
 require_relative '../lib/telepost'
 
 # Telepost test.
@@ -38,11 +39,13 @@ class TelepostTest < Minitest::Test
   end
 
   def test_real_posting
-    skip
+    cfg = '/code/home/assets/zerocracy/baza.yml'
+    skip unless File.exist?(cfg)
+    yaml = YAML.safe_load_file(cfg)
     tp = Telepost.new(
-      '1088589765:...',
-      chats: [-1_001_438_256_738] # codexia channel
+      yaml['tg']['token'],
+      chats: [yaml['tg']['admin_chat'].to_i]
     )
-    tp.spam('This is just a test message')
+    tp.spam('This is just a test message from telepost test')
   end
 end

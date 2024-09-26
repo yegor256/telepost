@@ -101,7 +101,7 @@ class Telepost
   # be the admin there). The lines provided will be
   # concatenated with a space between them.
   def post(chat, *lines)
-    @bot.send_message(
+    @bot.api.send_message(
       chat_id: chat,
       parse_mode: 'Markdown',
       disable_web_page_preview: true,
