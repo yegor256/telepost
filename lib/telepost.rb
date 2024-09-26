@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require 'telebot'
+require 'telegram/bot'
 
 # Telepost is a simple gateway to Telegram, which can post messages and
 # respond to primitive requests:
@@ -71,25 +71,16 @@ class Telepost
   # to the @BotFather in Telegram.
   def initialize(token, chats: [])
     @token = token
-    @client = Telebot::Client.new(token)
     @chats = chats
+    @bot = Telegram::Bot::Client.new(@token)
   end
 
   # You can run a chat bot to listen to the messages coming to it, in
   # a separate thread.
   def run
-    Telebot::Bot.new(@token).run do |chat, message|
-      if block_given?
-        yield(chat, message)
-      elsif !chat.nil?
-        id = message.chat.id
-        if id.positive?
-          post(
-            message.chat.id,
-            "This is your chat ID: `#{message.chat.id}`."
-          )
-        end
-      end
+    raise 'Block must be given' unless block_given?
+    @bot.listen do |message|
+      yield(message.chat.id, message.text)
     end
   rescue Net::OpenTimeout
     retry
@@ -110,14 +101,11 @@ class Telepost
   # be the admin there). The lines provided will be
   # concatenated with a space between them.
   def post(chat, *lines)
-    msg = lines.join(' ')
-    @client.send_message(
+    @bot.send_message(
       chat_id: chat,
       parse_mode: 'Markdown',
       disable_web_page_preview: true,
-      text: msg
+      text: lines.join(' ')
     )
-  rescue Telebot::Error => e
-    raise CantPost, "#{e.message}, can't post this message: \"#{msg}\""
   end
 end
