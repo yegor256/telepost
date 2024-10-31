@@ -40,7 +40,7 @@ GEM
     faraday-net_http (3.3.0)
       net-http
     ice_nine (0.11.2)
-    json (2.7.4)
+    json (2.7.5)
     language_server-protocol (3.17.0.3)
     logger (1.6.1)
     minitest (5.25.1)
@@ -55,7 +55,7 @@ GEM
     rainbow (3.1.1)
     rake (13.2.1)
     regexp_parser (2.9.2)
-    rubocop (1.67.0)
+    rubocop (1.68.0)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -65,7 +65,7 @@ GEM
       rubocop-ast (>= 1.32.2, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.32.3)
+    rubocop-ast (1.33.0)
       parser (>= 3.3.1.0)
     rubocop-rspec (3.2.0)
       rubocop (~> 1.61)
@@ -93,7 +93,7 @@ PLATFORMS
 DEPENDENCIES
   minitest (= 5.25.1)
   rake (= 13.2.1)
-  rubocop (= 1.67.0)
+  rubocop (= 1.68.0)
   rubocop-rspec (= 3.2.0)
   simplecov (= 0.22.0)
   telepost!
