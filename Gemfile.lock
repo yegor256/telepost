@@ -94,6 +94,7 @@ PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
   ruby
+  x64-mingw-ucrt
   x86_64-linux
 
 DEPENDENCIES
