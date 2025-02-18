@@ -98,7 +98,7 @@ GEM
     unicode-emoji (4.0.4)
     uri (1.0.2)
     yard (0.9.37)
-    zeitwerk (2.7.1)
+    zeitwerk (2.7.2)
 
 PLATFORMS
   arm64-darwin-22
