@@ -1,8 +1,8 @@
 *.gem
-.bundle/
 .DS_Store
-rdoc/
+.bundle/
 .idea/
 .yardoc/
 doc/
+rdoc/
 vendor/
