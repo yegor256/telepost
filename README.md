@@ -1,13 +1,13 @@
 # Ruby Telegram Client
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
-[![DevOps By Rultor.com](http://www.rultor.com/b/yegor256/telepost)](http://www.rultor.com/p/yegor256/telepost)
+[![DevOps By Rultor.com](https://www.rultor.com/b/yegor256/telepost)](https://www.rultor.com/p/yegor256/telepost)
 [![We recommend RubyMine](https://www.elegantobjects.org/rubymine.svg)](https://www.jetbrains.com/ruby/)
 
 [![rake](https://github.com/yegor256/telepost/actions/workflows/rake.yml/badge.svg)](https://github.com/yegor256/telepost/actions/workflows/rake.yml)
-[![Gem Version](https://badge.fury.io/rb/telepost.svg)](http://badge.fury.io/rb/telepost)
+[![Gem Version](https://badge.fury.io/rb/telepost.svg)](https://badge.fury.io/rb/telepost)
 [![Maintainability](https://api.codeclimate.com/v1/badges/21aec58faee3866bdfbb/maintainability)](https://codeclimate.com/github/yegor256/telepost/maintainability)
-[![Yard Docs](http://img.shields.io/badge/yard-docs-blue.svg)](http://rubydoc.info/github/yegor256/telepost/master/frames)
+[![Yard Docs](https://img.shields.io/badge/yard-docs-blue.svg)](https://rubydoc.info/github/yegor256/telepost/master/frames)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/telepost)](https://hitsofcode.com/view/github/yegor256/telepost)
 
 Telepost is a simple gateway to Telegram, which can post messages
