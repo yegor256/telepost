@@ -74,7 +74,7 @@ class Telepost
   def run
     raise 'Block must be given' unless block_given?
     @bot.listen do |message|
-      yield(message.chat.id, message.text)
+      yield(message.chat.id, message.respond_to?(:text) ? message.text : '')
     end
   rescue Net::OpenTimeout
     retry
