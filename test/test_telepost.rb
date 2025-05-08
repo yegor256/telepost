@@ -54,6 +54,7 @@ class TelepostTest < Minitest::Test
   end
 
   def test_real_posting
+    WebMock.enable_net_connect!
     cfg = '/code/home/assets/zerocracy/baza.yml'
     skip unless File.exist?(cfg)
     yaml = YAML.safe_load_file(cfg)
