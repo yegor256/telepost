@@ -42,7 +42,7 @@ Your bot has to be an admin of the channel, in order to post there.
 Here is how you "spam":
 
 ```ruby
-tp = Telepost.new('..token..', chats: ['my_channel'])
+tp = Telepost.new('..token..', chats: [12345])
 tp.spam('How are you?')
 ```
 
@@ -54,7 +54,7 @@ Read
 [these guidelines](https://www.yegor256.com/2014/04/15/github-guidelines.html).
 Make sure your build is green before you contribute
 your pull request. You will need to have
-[Ruby](https://www.ruby-lang.org/en/) 2.3+ and
+[Ruby](https://www.ruby-lang.org/en/) 3.2+ and
 [Bundler](https://bundler.io/) installed. Then:
 
 ```bash

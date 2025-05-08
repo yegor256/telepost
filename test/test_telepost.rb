@@ -15,7 +15,7 @@ class TelepostTest < Minitest::Test
   def test_fake_posting
     tp = Telepost::Fake.new
     tp.run
-    tp.post('This is', 'a simple', 'message')
+    tp.post(123, 'This is', 'a simple', 'message')
     assert_equal(1, tp.sent.count)
   end
 

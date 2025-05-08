@@ -21,7 +21,9 @@ require 'telegram/bot'
 # Copyright:: Copyright (c) 2018-2025 Yegor Bugayenko
 # License:: MIT
 class Telepost
-  # Fake one
+  # Fake implementation for testing
+  #
+  # @note Use this class for testing purposes
   class Fake
     attr_reader :sent
 
@@ -43,13 +45,20 @@ class Telepost
   end
 
   # When can't post a message
+  #
+  # @note Raised when message posting fails
   class CantPost < StandardError; end
 
   # To make it possible to get the client.
+  #
+  # @return [Telegram::Bot::Client] The Telegram bot client
   attr_reader :client
 
   # Makes a new object. To obtain a token you should talk
   # to the @BotFather in Telegram.
+  #
+  # @param token [String] Telegram bot token
+  # @param chats [Array<Integer>] Optional list of chat IDs
   def initialize(token, chats: [])
     @token = token
     @chats = chats
@@ -58,6 +67,10 @@ class Telepost
 
   # You can run a chat bot to listen to the messages coming to it, in
   # a separate thread.
+  #
+  # @yield [Integer, String] Yields chat ID and message text
+  # @return [void]
+  # @raise [RuntimeError] If no block is given
   def run
     raise 'Block must be given' unless block_given?
     @bot.listen do |message|
@@ -70,17 +83,24 @@ class Telepost
   # Send the message (lines will be concatenated with a space
   # between them) to the chats provided in the constructor
   # and encapsulated.
+  #
+  # @param lines [Array<String>] Message lines to send
+  # @return [void]
   def spam(*lines)
     @chats.each do |chat|
-      post(chat, lines)
+      post(chat, *lines)
     end
   end
 
   # Post a single message to the designated chat room. The
-  # chat argument can either me an integer, if you know the
+  # chat argument can either be an integer, if you know the
   # chat ID, or the name of the channel (your bot has to
   # be the admin there). The lines provided will be
   # concatenated with a space between them.
+  #
+  # @param chat [Integer, String] Chat ID or channel name
+  # @param lines [Array<String>] Message lines to send
+  # @return [Telegram::Bot::Types::Message] The sent message object
   def post(chat, *lines)
     @bot.api.send_message(
       chat_id: chat,
