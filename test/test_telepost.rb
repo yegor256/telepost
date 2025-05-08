@@ -19,8 +19,27 @@ class TelepostTest < Minitest::Test
     assert_equal(1, tp.sent.count)
   end
 
+  def test_fake_spam
+    tp = Telepost::Fake.new
+    tp.spam('how are you all?')
+  end
+
+  def test_sends_single_message
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/bottoken/sendMessage').to_return(body: '{}')
+    tp = Telepost.new('token')
+    tp.post(42, 'hey!')
+  end
+
+  def test_sends_simple_spam
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/bottoken/sendMessage').to_return(body: '{}')
+    tp = Telepost.new('token', chats: [42])
+    tp.spam('hey!')
+  end
+
   def test_real_posting
-    cfg = '/code/home/assets/zerocracy/baza.yml'
+    cfg = '/code/home/assets/zerocracy/baza00.yml'
     skip unless File.exist?(cfg)
     yaml = YAML.safe_load_file(cfg)
     tp = Telepost.new(
