@@ -101,10 +101,10 @@ class Telepost
   # @param chat [Integer, String] Chat ID or channel name
   # @param lines [Array<String>] Message lines to send
   # @return [Telegram::Bot::Types::Message] The sent message object
-  def post(chat, *lines)
+  def post(chat, *lines, parse_mode: 'Markdown')
     @bot.api.send_message(
       chat_id: chat,
-      parse_mode: 'MarkdownV2',
+      parse_mode:,
       disable_web_page_preview: true,
       text: lines.join(' ')
     )
