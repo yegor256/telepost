@@ -104,7 +104,7 @@ class Telepost
   def post(chat, *lines)
     @bot.api.send_message(
       chat_id: chat,
-      parse_mode: 'Markdown',
+      parse_mode: 'MarkdownV2',
       disable_web_page_preview: true,
       text: lines.join(' ')
     )
