@@ -18,6 +18,7 @@ GEM
       bigdecimal
       rexml
     docile (1.4.1)
+    drb (2.2.3)
     dry-core (1.1.0)
       concurrent-ruby (~> 1.0)
       logger
@@ -59,7 +60,8 @@ GEM
     logger (1.7.0)
     mcp (0.8.0)
       json-schema (>= 4.1)
-    minitest (6.0.1)
+    minitest (6.0.2)
+      drb (~> 2.0)
       prism (~> 1.5)
     minitest-reporters (1.7.1)
       ansi
