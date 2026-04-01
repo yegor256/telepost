@@ -60,7 +60,7 @@ GEM
     logger (1.7.0)
     mcp (0.9.2)
       json-schema (>= 4.1)
-    minitest (6.0.2)
+    minitest (6.0.3)
       drb (~> 2.0)
       prism (~> 1.5)
     minitest-reporters (1.7.1)
