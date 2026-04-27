@@ -42,6 +42,12 @@ class Telepost
     def post(chat, *lines)
       @sent << "#{chat}: #{lines.join(' ')}"
     end
+
+    def attach(chat, file, caption: nil)
+      path = file.is_a?(String) ? file : file.path
+      tail = caption.nil? ? '' : " caption=#{caption}"
+      @sent << "#{chat}: [attach:#{File.basename(path)}#{tail}]"
+    end
   end
 
   # When can't post a message
@@ -107,6 +113,30 @@ class Telepost
       parse_mode:,
       disable_web_page_preview: true,
       text: lines.join(' ')
+    )
+  end
+
+  # Attach a file (as a Telegram document) to the chat. The file
+  # argument can either be a path (String) or an open IO/File. The
+  # filename shown in Telegram comes from the basename of the path.
+  #
+  # @param chat [Integer, String] Chat ID or channel name
+  # @param file [String, File, IO] Path to the file or an open IO
+  # @param caption [String, nil] Optional caption for the attachment
+  # @param parse_mode [String] Parse mode used for the caption
+  # @return [Telegram::Bot::Types::Message] The sent message object
+  def attach(chat, file, caption: nil, parse_mode: 'Markdown')
+    document =
+      if file.is_a?(String)
+        Faraday::UploadIO.new(file, 'application/octet-stream', File.basename(file))
+      else
+        file
+      end
+    @bot.api.send_document(
+      chat_id: chat,
+      document:,
+      caption:,
+      parse_mode:
     )
   end
 end

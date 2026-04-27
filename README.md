@@ -46,6 +46,15 @@ tp = Telepost.new('..token..', chats: [12345])
 tp.spam('How are you?')
 ```
 
+You can also attach a file (sent as a Telegram document). The
+`file` argument accepts a path or an already-open `IO`/`File`,
+and `caption:` is optional:
+
+```ruby
+tp = Telepost.new('..token..')
+tp.attach(12345, '/tmp/dump.sql', caption: 'Today is dump')
+```
+
 That's it.
 
 ## How to contribute

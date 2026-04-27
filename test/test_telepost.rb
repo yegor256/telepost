@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2018-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
+require 'tmpdir'
 require 'yaml'
 require_relative 'test__helper'
 require_relative '../lib/telepost'
@@ -22,6 +23,50 @@ class TelepostTest < Minitest::Test
   def test_fake_spam
     tp = Telepost::Fake.new
     tp.spam('how are you all?')
+  end
+
+  def test_fake_attaches
+    Dir.mktmpdir do |dir|
+      file = File.join(dir, 'dump.txt')
+      File.write(file, 'payload')
+      tp = Telepost::Fake.new
+      tp.attach(77, file, caption: 'logs')
+      assert_equal(1, tp.sent.count, 'attachment was not recorded by Fake')
+    end
+  end
+
+  def test_fake_attach_format_is_recognizable
+    Dir.mktmpdir do |dir|
+      file = File.join(dir, 'snapshot.sql')
+      File.write(file, 'select 1')
+      tp = Telepost::Fake.new
+      tp.attach(99, file)
+      refute_nil(tp.sent.first[/snapshot\.sql/], 'basename is missing from Fake record')
+    end
+  end
+
+  def test_sends_attachment
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendDocument').to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      file = File.join(dir, 'note.txt')
+      File.write(file, 'hi there')
+      tp = Telepost.new('foo')
+      tp.attach(42, file, caption: 'see attached')
+    end
+  end
+
+  def test_sends_attachment_with_io
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botbar/sendDocument').to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'data.bin')
+      File.write(path, 'x')
+      File.open(path, 'rb') do |io|
+        tp = Telepost.new('bar')
+        tp.attach(7, io)
+      end
+    end
   end
 
   def test_sends_single_message
