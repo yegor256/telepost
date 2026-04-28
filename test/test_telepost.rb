@@ -5,8 +5,8 @@
 
 require 'tmpdir'
 require 'yaml'
-require_relative 'test__helper'
 require_relative '../lib/telepost'
+require_relative 'test__helper'
 
 # Telepost test.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -85,17 +85,45 @@ class TelepostTest < Minitest::Test
 
   def test_listens
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botxx/getUpdates')
-      .to_return(status: 200, body: '{}')
+    stub_request(:post, 'https://api.telegram.org/botxx/getUpdates').to_return(status: 200, body: '{}')
     tp = Telepost.new('xx')
     t =
       Thread.new do
-        tp.run do |chat, msg|
-          # we'll never reach this point
-        end
+        tp.run { |_chat, _msg| nil }
       end
     t.terminate
     t.join
+  end
+
+  def test_skips_nil_message_when_listening
+    tp = Telepost.new('xx')
+    bot = Object.new
+    bot.define_singleton_method(:listen) { |&blk| blk.call(nil) }
+    tp.instance_variable_set(:@bot, bot)
+    invoked = false
+    tp.run { |_chat, _msg| invoked = true }
+    refute(invoked, 'block must not be invoked when telegram delivers a nil update payload')
+  end
+
+  def test_skips_message_without_chat_when_listening
+    tp = Telepost.new('xx')
+    bot = Object.new
+    bot.define_singleton_method(:listen) { |&blk| blk.call(Object.new) }
+    tp.instance_variable_set(:@bot, bot)
+    invoked = false
+    tp.run { |_chat, _msg| invoked = true }
+    refute(invoked, 'block must not be invoked when the update carries no chat')
+  end
+
+  def test_yields_chat_id_and_text_when_listening
+    tp = Telepost.new('xx')
+    msg = Struct.new(:chat, :text).new(Struct.new(:id).new(7), 'hello')
+    bot = Object.new
+    bot.define_singleton_method(:listen) { |&blk| blk.call(msg) }
+    tp.instance_variable_set(:@bot, bot)
+    seen = nil
+    tp.run { |chat, text| seen = [chat, text] }
+    assert_equal([7, 'hello'], seen, 'chat id and text were not delivered to the block')
   end
 
   def test_real_posting
@@ -103,10 +131,7 @@ class TelepostTest < Minitest::Test
     cfg = '/code/home/assets/zerocracy/baza.yml'
     skip unless File.exist?(cfg)
     yaml = YAML.safe_load_file(cfg)
-    tp = Telepost.new(
-      yaml['tg']['token'],
-      chats: [yaml['tg']['admin_chat'].to_i]
-    )
+    tp = Telepost.new(yaml['tg']['token'], chats: [Integer(yaml['tg']['admin_chat'].to_s, 10)])
     tp.spam('This is just a test message from telepost test')
   end
 end

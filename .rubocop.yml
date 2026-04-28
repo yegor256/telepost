@@ -4,35 +4,17 @@
 # SPDX-License-Identifier: MIT
 ---
 AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+  SuggestExtensions: false
+  DisplayCopNames: true
   Exclude:
     - 'bin/**/*'
     - 'assets/**/*'
     - 'vendor/**/*'
     - 'j/**/*'
-  DisplayCopNames: true
-  TargetRubyVersion: 3.2
-  NewCops: enable
-  SuggestExtensions: false
 plugins:
   - rubocop-rake
   - rubocop-minitest
   - rubocop-performance
-Minitest/EmptyLineBeforeAssertionMethods:
-  Enabled: false
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-Layout/MultilineMethodCallIndentation:
-  Enabled: false
-Metrics/AbcSize:
-  Max: 50
-Metrics/MethodLength:
-  Max: 30
-Metrics/CyclomaticComplexity:
-  Max: 10
-Metrics/PerceivedComplexity:
-  Max: 10
-Metrics/ParameterLists:
-  Max: 10
-Layout/ParameterAlignment:
-  Enabled: false
-require: []
+  - rubocop-elegant

@@ -31,9 +31,7 @@ class Telepost
       @sent = []
     end
 
-    def run
-      # Nothing to do here
-    end
+    def run; end
 
     def spam(*lines)
       post(0, lines)
@@ -55,9 +53,6 @@ class Telepost
   # @note Raised when message posting fails
   class CantPost < StandardError; end
 
-  # To make it possible to get the client.
-  #
-  # @return [Telegram::Bot::Client] The Telegram bot client
   attr_reader :client
 
   # Makes a new object. To obtain a token you should talk
@@ -78,8 +73,10 @@ class Telepost
   # @return [void]
   # @raise [RuntimeError] If no block is given
   def run
-    raise 'Block must be given' unless block_given?
+    raise(RuntimeError, 'Block must be given') unless block_given?
     @bot.listen do |message|
+      next unless message.respond_to?(:chat)
+      next if message.chat.nil?
       yield(message.chat.id, message.respond_to?(:text) ? message.text : '')
     end
   rescue Net::OpenTimeout
@@ -108,12 +105,7 @@ class Telepost
   # @param lines [Array<String>] Message lines to send
   # @return [Telegram::Bot::Types::Message] The sent message object
   def post(chat, *lines, parse_mode: 'Markdown')
-    @bot.api.send_message(
-      chat_id: chat,
-      parse_mode:,
-      disable_web_page_preview: true,
-      text: lines.join(' ')
-    )
+    @bot.api.send_message(chat_id: chat, parse_mode:, disable_web_page_preview: true, text: lines.join(' '))
   end
 
   # Attach a file (as a Telegram document) to the chat. The file
@@ -132,11 +124,6 @@ class Telepost
       else
         file
       end
-    @bot.api.send_document(
-      chat_id: chat,
-      document:,
-      caption:,
-      parse_mode:
-    )
+    @bot.api.send_document(chat_id: chat, document:, caption:, parse_mode:)
   end
 end
