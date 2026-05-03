@@ -37,7 +37,7 @@ tp.post(12345, 'How are you?', 'How are you doing?')
 All lines you provide to the `post()` method will be concatenated
 with a space between them.
 
-Or you can pre-configure it to talk to certain list of chats.
+Or you can pre-configure it to talk to a certain list of chats.
 Your bot has to be an admin of the channel, in order to post there.
 Here is how you "spam":
 
