@@ -42,9 +42,7 @@ class Telepost
     end
 
     def attach(chat, file, caption: nil)
-      path = file.is_a?(String) ? file : file.path
-      tail = caption.nil? ? '' : " caption=#{caption}"
-      @sent << "#{chat}: [attach:#{File.basename(path)}#{tail}]"
+      @sent << "#{chat}: [attach:#{File.basename((file.is_a?(String) ? file : file.path))}#{" caption=#{caption}" unless caption.nil?}]"
     end
   end
 
@@ -118,12 +116,10 @@ class Telepost
   # @param parse_mode [String] Parse mode used for the caption
   # @return [Telegram::Bot::Types::Message] The sent message object
   def attach(chat, file, caption: nil, parse_mode: 'Markdown')
-    document =
-      if file.is_a?(String)
-        Faraday::UploadIO.new(file, 'application/octet-stream', File.basename(file))
-      else
-        file
-      end
-    @bot.api.send_document(chat_id: chat, document:, caption:, parse_mode:)
+    @bot.api.send_document(
+      chat_id: chat,
+      document: file.is_a?(String) ? Faraday::UploadIO.new(file, 'application/octet-stream', File.basename(file)) : file,
+      caption:, parse_mode:
+    )
   end
 end

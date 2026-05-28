@@ -18,3 +18,9 @@ plugins:
   - rubocop-minitest
   - rubocop-performance
   - rubocop-elegant
+Elegant/ClassInModule:
+  Exclude:
+    - 'lib/telepost.rb'
+    - 'test/**/*'
+Layout/LineLength:
+  Max: 140

@@ -21,8 +21,7 @@ class TelepostTest < Minitest::Test
   end
 
   def test_fake_spam
-    tp = Telepost::Fake.new
-    tp.spam('how are you all?')
+    Telepost::Fake.new.spam('how are you all?')
   end
 
   def test_fake_attaches
@@ -51,8 +50,7 @@ class TelepostTest < Minitest::Test
     Dir.mktmpdir do |dir|
       file = File.join(dir, 'note.txt')
       File.write(file, 'hi there')
-      tp = Telepost.new('foo')
-      tp.attach(42, file, caption: 'see attached')
+      Telepost.new('foo').attach(42, file, caption: 'see attached')
     end
   end
 
@@ -63,8 +61,7 @@ class TelepostTest < Minitest::Test
       path = File.join(dir, 'data.bin')
       File.write(path, 'x')
       File.open(path, 'rb') do |io|
-        tp = Telepost.new('bar')
-        tp.attach(7, io)
+        Telepost.new('bar').attach(7, io)
       end
     end
   end
@@ -72,15 +69,13 @@ class TelepostTest < Minitest::Test
   def test_sends_single_message
     WebMock.disable_net_connect!
     stub_request(:post, 'https://api.telegram.org/botfoo/sendMessage').to_return(body: '{}')
-    tp = Telepost.new('foo')
-    tp.post(42, 'hello!')
+    Telepost.new('foo').post(42, 'hello!')
   end
 
   def test_sends_simple_spam
     WebMock.disable_net_connect!
     stub_request(:post, 'https://api.telegram.org/bottoken/sendMessage').to_return(body: '{}')
-    tp = Telepost.new('token', chats: [42])
-    tp.spam('hey!')
+    Telepost.new('token', chats: [42]).spam('hey!')
   end
 
   def test_listens
@@ -131,7 +126,9 @@ class TelepostTest < Minitest::Test
     cfg = '/code/home/assets/zerocracy/baza.yml'
     skip unless File.exist?(cfg)
     yaml = YAML.safe_load_file(cfg)
-    tp = Telepost.new(yaml['tg']['token'], chats: [Integer(yaml['tg']['admin_chat'].to_s, 10)])
-    tp.spam('This is just a test message from telepost test')
+    Telepost.new(
+      yaml['tg']['token'],
+      chats: [Integer(yaml['tg']['admin_chat'].to_s, 10)]
+    ).spam('This is just a test message from telepost test')
   end
 end
