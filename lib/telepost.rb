@@ -138,7 +138,10 @@ class Telepost
   # @return [Telegram::Bot::Types::Message] The sent message object
   def attach(chat, file, caption: nil, parse_mode: 'Markdown')
     return album(chat, file, caption:, parse_mode:) if file.is_a?(Array)
-    @bot.api.send_document(chat_id: chat, document: upload(file), caption:, parse_mode:)
+    io = upload(file)
+    @bot.api.send_document(chat_id: chat, document: io, caption:, parse_mode:)
+  ensure
+    io.close if file.is_a?(String) && io.respond_to?(:close)
   end
 
   PHOTO_EXTENSIONS = %w[.jpg .jpeg .png .gif .webp].freeze
@@ -146,10 +149,13 @@ class Telepost
   private
 
   def album(chat, files, caption: nil, parse_mode: 'Markdown')
+    opened = []
     params = { chat_id: chat }
     params[:media] =
       files.each_with_index.map do |file, idx|
-        params[:"file#{idx}"] = upload(file)
+        io = upload(file)
+        opened << io if file.is_a?(String)
+        params[:"file#{idx}"] = io
         attrs = { media: "attach://file#{idx}" }
         if idx.zero? && !caption.nil?
           attrs[:caption] = caption
@@ -158,6 +164,8 @@ class Telepost
         klass(file).new(**attrs)
       end
     @bot.api.send_media_group(**params)
+  ensure
+    opened.each(&:close)
   end
 
   def upload(file)
