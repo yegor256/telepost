@@ -42,7 +42,22 @@ class Telepost
     end
 
     def attach(chat, file, caption: nil)
-      @sent << "#{chat}: [attach:#{File.basename((file.is_a?(String) ? file : file.path))}#{" caption=#{caption}" unless caption.nil?}]"
+      @sent <<
+        if file.is_a?(Array)
+          "#{chat}: [attach-group:#{names(file)}#{cap(caption)}]"
+        else
+          "#{chat}: [attach:#{names([file])}#{cap(caption)}]"
+        end
+    end
+
+    private
+
+    def names(files)
+      files.map { |f| File.basename(f.is_a?(String) ? f : f.path) }.join(',')
+    end
+
+    def cap(caption)
+      caption.nil? ? '' : " caption=#{caption}"
     end
   end
 
@@ -110,16 +125,59 @@ class Telepost
   # argument can either be a path (String) or an open IO/File. The
   # filename shown in Telegram comes from the basename of the path.
   #
+  # When +file+ is an +Array+, all of its items are posted as a single
+  # grouped message (a Telegram "album") via +sendMediaGroup+. Items
+  # with an image extension are wrapped in +InputMediaPhoto+, the rest
+  # in +InputMediaDocument+. The +caption+ is attached to the first
+  # item only, so the album shows one caption.
+  #
   # @param chat [Integer, String] Chat ID or channel name
-  # @param file [String, File, IO] Path to the file or an open IO
+  # @param file [String, File, IO, Array] File (or array of files) to attach
   # @param caption [String, nil] Optional caption for the attachment
   # @param parse_mode [String] Parse mode used for the caption
   # @return [Telegram::Bot::Types::Message] The sent message object
   def attach(chat, file, caption: nil, parse_mode: 'Markdown')
-    @bot.api.send_document(
-      chat_id: chat,
-      document: file.is_a?(String) ? Faraday::UploadIO.new(file, 'application/octet-stream', File.basename(file)) : file,
-      caption:, parse_mode:
-    )
+    return album(chat, file, caption:, parse_mode:) if file.is_a?(Array)
+    io = upload(file)
+    @bot.api.send_document(chat_id: chat, document: io, caption:, parse_mode:)
+  ensure
+    io.close if file.is_a?(String) && io.respond_to?(:close)
+  end
+
+  PHOTO_EXTENSIONS = %w[.jpg .jpeg .png .gif .webp].freeze
+
+  private
+
+  def album(chat, files, caption: nil, parse_mode: 'Markdown')
+    opened = []
+    params = { chat_id: chat }
+    params[:media] =
+      files.each_with_index.map do |file, idx|
+        io = upload(file)
+        opened << io if file.is_a?(String)
+        params[:"file#{idx}"] = io
+        attrs = { media: "attach://file#{idx}" }
+        if idx.zero? && !caption.nil?
+          attrs[:caption] = caption
+          attrs[:parse_mode] = parse_mode
+        end
+        klass(file).new(**attrs)
+      end
+    @bot.api.send_media_group(**params)
+  ensure
+    opened.each(&:close)
+  end
+
+  def upload(file)
+    return file unless file.is_a?(String)
+    Faraday::UploadIO.new(file, 'application/octet-stream', File.basename(file))
+  end
+
+  def klass(file)
+    photo?(file) ? Telegram::Bot::Types::InputMediaPhoto : Telegram::Bot::Types::InputMediaDocument
+  end
+
+  def photo?(file)
+    PHOTO_EXTENSIONS.include?(File.extname(file.is_a?(String) ? file : file.path).downcase)
   end
 end
