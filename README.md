@@ -55,6 +55,16 @@ tp = Telepost.new('..token..')
 tp.attach(12345, '/tmp/dump.sql', caption: 'Today is dump')
 ```
 
+You can also pass an array of files, to post them all as a single
+grouped message (a Telegram "album"). Files with an image extension
+are sent as photos, the rest as documents, and the `caption:` is
+shown once, on the first item:
+
+```ruby
+tp = Telepost.new('..token..')
+tp.attach(12345, ['/tmp/a.png', '/tmp/b.png'], caption: 'Two shots')
+```
+
 That's it.
 
 ## How to contribute

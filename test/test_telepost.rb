@@ -66,6 +66,32 @@ class TelepostTest < Minitest::Test
     end
   end
 
+  def test_fake_attaches_a_group
+    Dir.mktmpdir do |dir|
+      one = File.join(dir, 'a.png')
+      two = File.join(dir, 'b.png')
+      File.write(one, 'x')
+      File.write(two, 'y')
+      tp = Telepost::Fake.new
+      tp.attach(77, [one, two], caption: 'shots')
+      assert_equal(1, tp.sent.count, 'media group must be recorded as a single call')
+      assert_match(/attach-group:a\.png,b\.png/, tp.sent.first)
+      assert_match(/caption=shots/, tp.sent.first)
+    end
+  end
+
+  def test_sends_media_group
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendMediaGroup').to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      one = File.join(dir, 'a.png')
+      two = File.join(dir, 'b.jpg')
+      File.write(one, 'x')
+      File.write(two, 'y')
+      Telepost.new('foo').attach(42, [one, two], caption: 'see album')
+    end
+  end
+
   def test_sends_single_message
     WebMock.disable_net_connect!
     stub_request(:post, 'https://api.telegram.org/botfoo/sendMessage').to_return(body: '{}')
