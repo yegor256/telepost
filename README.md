@@ -46,13 +46,15 @@ tp = Telepost.new('..token..', chats: [12345])
 tp.spam('How are you?')
 ```
 
-You can also attach a file (sent as a Telegram document). The
-`file` argument accepts a path or an already-open `IO`/`File`,
-and `caption:` is optional:
+You can also attach a file. The `file` argument accepts a path or
+an already-open `IO`/`File`, and `caption:` is optional. A file with
+an image extension goes out as a photo, which Telegram shows inline,
+while everything else goes out as a document:
 
 ```ruby
 tp = Telepost.new('..token..')
 tp.attach(12345, '/tmp/dump.sql', caption: 'Today is dump')
+tp.attach(12345, '/tmp/chart.png', caption: 'Today is chart')
 ```
 
 You can also pass an array of files, to post them all as a single
