@@ -121,9 +121,11 @@ class Telepost
     @bot.api.send_message(chat_id: chat, parse_mode:, disable_web_page_preview: true, text: lines.join(' '))
   end
 
-  # Attach a file (as a Telegram document) to the chat. The file
-  # argument can either be a path (String) or an open IO/File. The
-  # filename shown in Telegram comes from the basename of the path.
+  # Attach a file to the chat. The file argument can either be a
+  # path (String) or an open IO/File. The filename shown in Telegram
+  # comes from the basename of the path. A file with an image
+  # extension goes out as a photo via +sendPhoto+, so Telegram shows
+  # it inline, and everything else as a document via +sendDocument+.
   #
   # When +file+ is an +Array+, all of its items are posted as a single
   # grouped message (a Telegram "album") via +sendMediaGroup+. Items
@@ -139,7 +141,11 @@ class Telepost
   def attach(chat, file, caption: nil, parse_mode: 'Markdown')
     return album(chat, file, caption:, parse_mode:) if file.is_a?(Array)
     io = upload(file)
-    @bot.api.send_document(chat_id: chat, document: io, caption:, parse_mode:)
+    if photo?(file)
+      @bot.api.send_photo(chat_id: chat, photo: io, caption:, parse_mode:)
+    else
+      @bot.api.send_document(chat_id: chat, document: io, caption:, parse_mode:)
+    end
   ensure
     io.close if file.is_a?(String) && io.respond_to?(:close)
   end

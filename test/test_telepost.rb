@@ -66,6 +66,30 @@ class TelepostTest < Minitest::Test
     end
   end
 
+  def test_sends_lone_image_as_photo
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendPhoto').to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      file = File.join(dir, 'chart.png')
+      File.write(file, 'png')
+      Telepost.new('foo').attach(42, file, caption: 'look')
+    end
+    assert_requested(:post, 'https://api.telegram.org/botfoo/sendPhoto')
+  end
+
+  def test_sends_lone_image_io_as_photo
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botbar/sendPhoto').to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'shot.JPEG')
+      File.write(path, 'x')
+      File.open(path, 'rb') do |io|
+        Telepost.new('bar').attach(7, io)
+      end
+    end
+    assert_requested(:post, 'https://api.telegram.org/botbar/sendPhoto')
+  end
+
   def test_fake_attaches_a_group
     Dir.mktmpdir do |dir|
       one = File.join(dir, 'a.png')
