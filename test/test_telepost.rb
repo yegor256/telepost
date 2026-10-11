@@ -171,6 +171,28 @@ class TelepostTest < Minitest::Test
     assert_equal([7, 'hello'], seen, 'chat id and text were not delivered to the block')
   end
 
+  def test_yields_sender_username_when_listening
+    tp = Telepost.new('xx')
+    msg = Struct.new(:chat, :text, :from).new(Struct.new(:id).new(7), 'hello', Struct.new(:username).new('jeff'))
+    bot = Object.new
+    bot.define_singleton_method(:listen) { |&blk| blk.call(msg) }
+    tp.instance_variable_set(:@bot, bot)
+    seen = nil
+    tp.run { |_chat, _text, user| seen = user }
+    assert_equal('jeff', seen, 'sender username was not delivered to the block')
+  end
+
+  def test_yields_nil_sender_when_update_has_no_from
+    tp = Telepost.new('xx')
+    msg = Struct.new(:chat, :text, :from).new(Struct.new(:id).new(7), 'hello', nil)
+    bot = Object.new
+    bot.define_singleton_method(:listen) { |&blk| blk.call(msg) }
+    tp.instance_variable_set(:@bot, bot)
+    seen = 'unset'
+    tp.run { |_chat, _text, user| seen = user }
+    assert_nil(seen, 'sender must be nil when the update has no from')
+  end
+
   def test_real_posting
     WebMock.enable_net_connect!
     cfg = '/code/home/assets/zerocracy/baza.yml'

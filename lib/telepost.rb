@@ -10,8 +10,8 @@ require 'telegram/bot'
 #
 #  require 'telepost'
 #  tp = Telepost.new('... secret token ...')
-#  tp.run do |chat, msg|
-#    # Reply to the message via tp.post(msg, chat)
+#  tp.run do |chat, msg, user|
+#    # Reply to the message via tp.post(chat, msg), user is the sender
 #  end
 #
 # For more information read
@@ -82,7 +82,9 @@ class Telepost
   # You can run a chat bot to listen to the messages coming to it, in
   # a separate thread.
   #
-  # @yield [Integer, String] Yields chat ID and message text
+  # @yield [Integer, String, String, nil] Yields chat ID, message text, and
+  #   sender username, which is +nil+ when the sender has no username or the
+  #   update has no sender
   # @return [void]
   # @raise [RuntimeError] If no block is given
   def run
@@ -90,7 +92,11 @@ class Telepost
     @bot.listen do |message|
       next unless message.respond_to?(:chat)
       next if message.chat.nil?
-      yield(message.chat.id, message.respond_to?(:text) ? message.text : '')
+      yield(
+        message.chat.id,
+        message.respond_to?(:text) ? message.text : '',
+        message.respond_to?(:from) ? message.from&.username : nil
+      )
     end
   rescue Net::OpenTimeout
     retry
