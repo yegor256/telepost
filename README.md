@@ -27,8 +27,8 @@ Then, use it like this:
 require 'telepost'
 tp = Telepost.new('..token..')
 Thread.start do
-  tp.run do |chat, msg|
-    tp.post(chat, 'Thanks for talking to me!')
+  tp.run do |chat, msg, user|
+    tp.post(chat, "Thanks for talking to me, @#{user}!")
   end
 end
 tp.post(12345, 'How are you?', 'How are you doing?')
