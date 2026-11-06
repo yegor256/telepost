@@ -134,7 +134,7 @@ class TelepostTest < Minitest::Test
     tp = Telepost.new('xx')
     t =
       Thread.new do
-        tp.run { |_chat, _msg| nil }
+        tp.run { |_chat, _msg| Thread.pass }
       end
     t.terminate
     t.join
