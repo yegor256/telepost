@@ -13,6 +13,10 @@ require_relative 'test__helper'
 # Copyright:: Copyright (c) 2018-2026 Yegor Bugayenko
 # License:: MIT
 class TelepostTest < Minitest::Test
+  MESSAGE = { message_id: 1, date: 0, chat: { id: 42, type: 'private' } }.freeze
+  RESPONSE = { ok: true, result: MESSAGE }.to_json
+  MEDIA_RESPONSE = { ok: true, result: [MESSAGE] }.to_json
+
   def test_fake_posting
     tp = Telepost::Fake.new
     tp.run
@@ -46,7 +50,7 @@ class TelepostTest < Minitest::Test
 
   def test_sends_attachment
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botfoo/sendDocument').to_return(body: '{}')
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendDocument').to_return(body: RESPONSE)
     Dir.mktmpdir do |dir|
       file = File.join(dir, 'note.txt')
       File.write(file, 'hi there')
@@ -56,7 +60,7 @@ class TelepostTest < Minitest::Test
 
   def test_sends_attachment_with_io
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botbar/sendDocument').to_return(body: '{}')
+    stub_request(:post, 'https://api.telegram.org/botbar/sendDocument').to_return(body: RESPONSE)
     Dir.mktmpdir do |dir|
       path = File.join(dir, 'data.bin')
       File.write(path, 'x')
@@ -68,7 +72,7 @@ class TelepostTest < Minitest::Test
 
   def test_sends_lone_image_as_photo
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botfoo/sendPhoto').to_return(body: '{}')
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendPhoto').to_return(body: RESPONSE)
     Dir.mktmpdir do |dir|
       file = File.join(dir, 'chart.png')
       File.write(file, 'png')
@@ -79,7 +83,7 @@ class TelepostTest < Minitest::Test
 
   def test_sends_lone_image_io_as_photo
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botbar/sendPhoto').to_return(body: '{}')
+    stub_request(:post, 'https://api.telegram.org/botbar/sendPhoto').to_return(body: RESPONSE)
     Dir.mktmpdir do |dir|
       path = File.join(dir, 'shot.JPEG')
       File.write(path, 'x')
@@ -106,38 +110,44 @@ class TelepostTest < Minitest::Test
 
   def test_sends_media_group
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botfoo/sendMediaGroup').to_return(body: '{}')
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendMediaGroup').to_return(body: MEDIA_RESPONSE)
     Dir.mktmpdir do |dir|
       one = File.join(dir, 'a.png')
       two = File.join(dir, 'b.jpg')
       File.write(one, 'x')
       File.write(two, 'y')
-      Telepost.new('foo').attach(42, [one, two], caption: 'see album')
+      assert_instance_of(Telegram::Bot::Types::Message, Telepost.new('foo').attach(42, [one, two], caption: 'see album').first)
     end
   end
 
   def test_sends_single_message
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botfoo/sendMessage').to_return(body: '{}')
-    Telepost.new('foo').post(42, 'hello!')
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendMessage').to_return(body: RESPONSE)
+    message = Telepost.new('foo').post(42, 'hello!')
+    assert_instance_of(Telegram::Bot::Types::Message, message)
+    assert_equal(42, message.chat.id)
   end
 
   def test_sends_simple_spam
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/bottoken/sendMessage').to_return(body: '{}')
+    stub_request(:post, 'https://api.telegram.org/bottoken/sendMessage').to_return(body: RESPONSE)
     Telepost.new('token', chats: [42]).spam('hey!')
   end
 
   def test_listens
     WebMock.disable_net_connect!
-    stub_request(:post, 'https://api.telegram.org/botxx/getUpdates').to_return(status: 200, body: '{}')
-    tp = Telepost.new('xx')
-    t =
-      Thread.new do
-        tp.run { |_chat, _msg| Thread.pass }
-      end
-    t.terminate
-    t.join
+    stub_request(
+      :post,
+      'https://api.telegram.org/botxx/getUpdates'
+    ).to_return(
+      body: { ok: true, result: [{ update_id: 1, message: MESSAGE.merge(text: 'hello!') }] }.to_json
+    )
+    received = nil
+    Telepost.new('xx').run do |chat, text|
+      received = [chat, text]
+      break
+    end
+    assert_equal([42, 'hello!'], received)
   end
 
   def test_skips_nil_message_when_listening
