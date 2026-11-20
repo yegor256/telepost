@@ -104,6 +104,50 @@ class TelepostTest < Minitest::Test
     end
   end
 
+  def test_sends_gif_as_animation
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendAnimation')
+      .with { |req| req.body.include?('name="animation"') && req.body.include?('look') }
+      .to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      file = File.join(dir, 'clip.gif')
+      File.write(file, 'GIF89a')
+      Telepost.new('foo').attach(42, file, caption: 'look')
+    end
+    assert_requested(:post, 'https://api.telegram.org/botfoo/sendAnimation')
+  end
+
+  def test_sends_gif_io_as_animation
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botbar/sendAnimation').to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'clip.GIF')
+      File.write(path, 'GIF89a')
+      File.open(path, 'rb') do |io|
+        Telepost.new('bar').attach(7, io)
+        refute_predicate(io, :closed?, 'caller-owned GIF must remain open')
+      end
+    end
+    assert_requested(:post, 'https://api.telegram.org/botbar/sendAnimation')
+  end
+
+  def test_sends_album_gifs_as_documents
+    WebMock.disable_net_connect!
+    stub_request(:post, 'https://api.telegram.org/botfoo/sendMediaGroup')
+      .with { |req| req.body.scan('"type":"document"').size == 2 }
+      .to_return(body: '{}')
+    Dir.mktmpdir do |dir|
+      one = File.join(dir, 'a.gif')
+      two = File.join(dir, 'b.GIF')
+      File.write(one, 'GIF89a')
+      File.write(two, 'GIF89a')
+      File.open(two, 'rb') do |io|
+        Telepost.new('foo').attach(42, [one, io], caption: 'clips')
+      end
+    end
+    assert_requested(:post, 'https://api.telegram.org/botfoo/sendMediaGroup')
+  end
+
   def test_sends_media_group
     WebMock.disable_net_connect!
     stub_request(:post, 'https://api.telegram.org/botfoo/sendMediaGroup').to_return(body: '{}')
