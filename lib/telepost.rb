@@ -131,12 +131,14 @@ class Telepost
   # path (String) or an open IO/File. The filename shown in Telegram
   # comes from the basename of the path. A file with an image
   # extension goes out as a photo via +sendPhoto+, so Telegram shows
-  # it inline, and everything else as a document via +sendDocument+.
+  # it inline. GIFs use +sendAnimation+, and everything else goes out
+  # as a document via +sendDocument+.
   #
   # When +file+ is an +Array+, all of its items are posted as a single
   # grouped message (a Telegram "album") via +sendMediaGroup+. Items
   # with an image extension are wrapped in +InputMediaPhoto+, the rest
-  # in +InputMediaDocument+. The +caption+ is attached to the first
+  # in +InputMediaDocument+, including GIFs because albums do not support
+  # animations. The +caption+ is attached to the first
   # item only, so the album shows one caption.
   #
   # @param chat [Integer, String] Chat ID or channel name
@@ -147,7 +149,9 @@ class Telepost
   def attach(chat, file, caption: nil, parse_mode: 'Markdown')
     return album(chat, file, caption:, parse_mode:) if file.is_a?(Array)
     io = upload(file)
-    if photo?(file)
+    if extension(file) == '.gif'
+      @bot.api.send_animation(chat_id: chat, animation: io, caption:, parse_mode:)
+    elsif photo?(file)
       @bot.api.send_photo(chat_id: chat, photo: io, caption:, parse_mode:)
     else
       @bot.api.send_document(chat_id: chat, document: io, caption:, parse_mode:)
@@ -156,7 +160,7 @@ class Telepost
     io.close if file.is_a?(String) && io.respond_to?(:close)
   end
 
-  PHOTO_EXTENSIONS = %w[.jpg .jpeg .png .gif .webp].freeze
+  PHOTO_EXTENSIONS = %w[.jpg .jpeg .png .webp].freeze
 
   private
 
@@ -190,6 +194,10 @@ class Telepost
   end
 
   def photo?(file)
-    PHOTO_EXTENSIONS.include?(File.extname(file.is_a?(String) ? file : file.path).downcase)
+    PHOTO_EXTENSIONS.include?(extension(file))
+  end
+
+  def extension(file)
+    File.extname(file.is_a?(String) ? file : file.path).downcase
   end
 end
