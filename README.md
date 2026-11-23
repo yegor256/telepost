@@ -48,8 +48,8 @@ tp.spam('How are you?')
 
 You can also attach a file. The `file` argument accepts a path or
 an already-open `IO`/`File`, and `caption:` is optional. A file with
-an image extension goes out as a photo, which Telegram shows inline,
-while everything else goes out as a document:
+an image extension goes out as a photo, which Telegram shows inline.
+GIF files are sent as animations, while everything else goes out as a document:
 
 ```ruby
 tp = Telepost.new('..token..')
@@ -59,8 +59,9 @@ tp.attach(12345, '/tmp/chart.png', caption: 'Today is chart')
 
 You can also pass an array of files, to post them all as a single
 grouped message (a Telegram "album"). Files with an image extension
-are sent as photos, the rest as documents, and the `caption:` is
-shown once, on the first item:
+are sent as photos, except GIF files, which are sent as documents because
+Telegram albums do not support animations. Other files are also sent as
+documents, and the `caption:` is shown once, on the first item:
 
 ```ruby
 tp = Telepost.new('..token..')
